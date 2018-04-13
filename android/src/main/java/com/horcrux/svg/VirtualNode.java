@@ -21,8 +21,11 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.ReactConstants;
 import com.facebook.react.uimanager.DisplayMetricsHolder;
 import com.facebook.react.uimanager.LayoutShadowNode;
+import com.facebook.react.uimanager.OnLayoutEvent;
 import com.facebook.react.uimanager.ReactShadowNode;
+import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.uimanager.events.EventDispatcher;
 
 import javax.annotation.Nullable;
 
@@ -47,6 +50,7 @@ abstract class VirtualNode extends LayoutShadowNode {
     Matrix mMatrix = new Matrix();
     Matrix mInvMatrix = new Matrix();
     boolean mInvertible = true;
+    RectF mClientRect;
 
     private int mClipRule;
     private @Nullable String mClipPath;
@@ -157,6 +161,7 @@ abstract class VirtualNode extends LayoutShadowNode {
     int saveAndSetupCanvas(Canvas canvas) {
         int count = canvas.save();
         canvas.concat(mMatrix);
+        this.getSvgShadowNode().pushMatrix(mMatrix);
         return count;
     }
 
@@ -168,6 +173,7 @@ abstract class VirtualNode extends LayoutShadowNode {
      */
     void restoreCanvas(Canvas canvas, int count) {
         canvas.restoreToCount(count);
+        this.getSvgShadowNode().popMatrix();
     }
 
     @ReactProp(name = "name")
@@ -345,4 +351,26 @@ abstract class VirtualNode extends LayoutShadowNode {
             runner.run(child);
         }
     }
+
+    void setClientRect(RectF rect) {
+        if (mClientRect != null && mClientRect.equals(rect)) {
+            return;
+        }
+        mClientRect = rect;
+        EventDispatcher eventDispatcher = this.getThemedContext()
+                .getNativeModule(UIManagerModule.class)
+                .getEventDispatcher();
+        eventDispatcher.dispatchEvent(OnLayoutEvent.obtain(
+                this.getReactTag(),
+                (int) mClientRect.left,
+                (int) mClientRect.top,
+                (int) mClientRect.width(),
+                (int) mClientRect.height()
+        ));
+    }
+
+    public RectF getClientRect() {
+        return mClientRect;
+    }
+
 }
