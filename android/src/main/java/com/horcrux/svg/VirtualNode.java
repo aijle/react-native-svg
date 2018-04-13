@@ -157,6 +157,7 @@ abstract class VirtualNode extends LayoutShadowNode {
     int saveAndSetupCanvas(Canvas canvas) {
         int count = canvas.save();
         canvas.concat(mMatrix);
+        this.getSvgShadowNode().pushMatrix(mMatrix);
         return count;
     }
 
@@ -168,6 +169,7 @@ abstract class VirtualNode extends LayoutShadowNode {
      */
     void restoreCanvas(Canvas canvas, int count) {
         canvas.restoreToCount(count);
+        this.getSvgShadowNode().popMatrix();
     }
 
     @ReactProp(name = "name")
