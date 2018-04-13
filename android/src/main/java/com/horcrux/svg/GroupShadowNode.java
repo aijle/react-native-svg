@@ -105,6 +105,9 @@ class GroupShadowNode extends RenderableShadowNode {
         });
         RectF groupRect = null;
         for (RectF r : rects) {
+            if (r == null) {
+                continue;
+            }
             if (groupRect == null) {
                 groupRect = r;
             } else {
