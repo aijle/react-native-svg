@@ -18,6 +18,8 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.ReactShadowNode;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
+import java.util.LinkedList;
+
 import javax.annotation.Nullable;
 
 /**
@@ -69,6 +71,7 @@ class GroupShadowNode extends RenderableShadowNode {
         pushGlyphContext();
         final SvgViewShadowNode svg = getSvgShadowNode();
         final GroupShadowNode self = this;
+        final LinkedList<RectF> rects = new LinkedList<RectF>();
         traverseChildren(new NodeRunnable() {
             public void run(ReactShadowNode lNode) {
                 if (lNode instanceof VirtualNode) {
@@ -79,6 +82,8 @@ class GroupShadowNode extends RenderableShadowNode {
 
                     int count = node.saveAndSetupCanvas(canvas);
                     node.draw(canvas, paint, opacity * mOpacity);
+                    RectF r = node.getClientRect();
+                    rects.add(node.getClientRect());
                     node.restoreCanvas(canvas, count);
 
                     if (node instanceof RenderableShadowNode) {
@@ -98,6 +103,15 @@ class GroupShadowNode extends RenderableShadowNode {
                 }
             }
         });
+        RectF groupRect = null;
+        for (RectF r : rects) {
+            if (groupRect == null) {
+                groupRect = r;
+            } else {
+                groupRect.union(r);
+            }
+        }
+        this.setClientRect(groupRect);
         popGlyphContext();
     }
 
