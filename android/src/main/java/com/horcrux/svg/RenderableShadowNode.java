@@ -212,17 +212,7 @@ abstract public class RenderableShadowNode extends VirtualNode {
             mPath.computeBounds(r, true);
             Matrix m = this.getSvgShadowNode().getReverseTransform();
             m.mapRect(r);
-
-            EventDispatcher eventDispatcher = this.getThemedContext()
-                    .getNativeModule(UIManagerModule.class)
-                    .getEventDispatcher();
-            eventDispatcher.dispatchEvent(OnLayoutEvent.obtain(
-                    this.getReactTag(),
-                    (int) r.left,
-                    (int) r.top,
-                    (int) r.width(),
-                    (int) r.height()
-            ));
+            this.setClientRect(r);
 
             clip(canvas, paint);
 
