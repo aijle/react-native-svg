@@ -52,4 +52,8 @@
 
 - (void)drawToContext:(CGContextRef)context withRect:(CGRect)rect;
 
+- (void)pushTransform:(CGAffineTransform)transform;
+- (CGAffineTransform)popTransform;
+- (CGAffineTransform)reverseTransform;
+
 @end
