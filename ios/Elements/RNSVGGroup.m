@@ -33,6 +33,8 @@
 - (void)renderGroupTo:(CGContextRef)context rect:(CGRect)rect
 {
     [self pushGlyphContext];
+    
+    NSMutableArray *rects = [[NSMutableArray alloc] initWithCapacity:self.subviews.count];
 
     [self traverseSubviews:^(UIView *node) {
         if ([node isKindOfClass:[RNSVGNode class]]) {
@@ -46,6 +48,9 @@
             }
 
             [svgNode renderTo:context rect:rect];
+            
+            CGRect nodeRect = svgNode.clientRect;
+            [rects addObject:[NSValue valueWithCGRect:nodeRect]];
 
             if ([node isKindOfClass:[RNSVGRenderable class]]) {
                 [(RNSVGRenderable*)node resetProperties];
@@ -61,6 +66,20 @@
 
         return YES;
     }];
+    __block CGRect groupRect = CGRectZero;
+    [rects enumerateObjectsUsingBlock:^(NSValue *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        const CGRect nodeRect = obj.CGRectValue;
+        if (CGRectIsEmpty(nodeRect)) {
+            return ;
+        }
+        if (CGRectIsEmpty(groupRect)) {
+            memcpy(&groupRect, &nodeRect, sizeof(CGRect));
+        } else {
+            CGRect unionRect = CGRectUnion(groupRect, nodeRect);
+            memcpy(&groupRect, &unionRect, sizeof(CGRect));
+        }
+    }];
+    self.clientRect = groupRect;
     [self popGlyphContext];
 }
 
