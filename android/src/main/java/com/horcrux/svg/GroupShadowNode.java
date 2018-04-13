@@ -82,7 +82,6 @@ class GroupShadowNode extends RenderableShadowNode {
 
                     int count = node.saveAndSetupCanvas(canvas);
                     node.draw(canvas, paint, opacity * mOpacity);
-                    RectF r = node.getClientRect();
                     rects.add(node.getClientRect());
                     node.restoreCanvas(canvas, count);
 
