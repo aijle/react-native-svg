@@ -18,7 +18,10 @@
     NSMutableDictionary<NSString *, RNSVGPainter *> *_painters;
     CGAffineTransform _viewBoxTransform;
     CGAffineTransform _invviewBoxTransform;
+    NSMutableArray<NSValue *> *transforms;
 }
+
+@synthesize viewBoxTransform = _viewBoxTransform;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -26,6 +29,7 @@
     // This is necessary to ensure that [self setNeedsDisplay] actually triggers
     // a redraw when our parent transitions between hidden and visible.
     self.contentMode = UIViewContentModeRedraw;
+    transforms = [[NSMutableArray alloc] init];
   }
   return self;
 }
@@ -142,15 +146,20 @@
                                            meetOrSlice:self.meetOrSlice];
         _invviewBoxTransform = CGAffineTransformInvert(_viewBoxTransform);
         CGContextConcatCTM(context, _viewBoxTransform);
+        [self pushTransform:_viewBoxTransform];
     }
 
     for (UIView *node in self.subviews) {
         if ([node isKindOfClass:[RNSVGNode class]]) {
             RNSVGNode *svg = (RNSVGNode *)node;
-            [svg renderTo:context rect:rect];
+            [svg renderTo:context
+                     rect:rect];
         } else {
             [node drawRect:rect];
         }
+    }
+    if (self.align) {
+        [self popTransform];
     }
 }
 
@@ -264,5 +273,28 @@
 {
     return CGContextGetClipBoundingBox(UIGraphicsGetCurrentContext());
 }
+
+- (void)pushTransform:(CGAffineTransform)transform {
+    NSValue *const value = [NSValue valueWithCGAffineTransform:transform];
+    [transforms addObject:value];
+}
+
+- (CGAffineTransform)popTransform {
+    NSValue *const value = transforms.lastObject;
+    [transforms removeLastObject];
+    return value.CGAffineTransformValue;
+}
+
+- (CGAffineTransform)getReverseTransform {
+    CGAffineTransform t = CGAffineTransformIdentity;
+    NSEnumerator<NSValue *> *const enumerator = [transforms reverseObjectEnumerator];
+    NSValue *v = nil;
+    while ((v = enumerator.nextObject)) {
+        const CGAffineTransform nextT = v.CGAffineTransformValue;
+        t = CGAffineTransformConcat(t, nextT);
+    }
+    return t;
+}
+
 
 @end

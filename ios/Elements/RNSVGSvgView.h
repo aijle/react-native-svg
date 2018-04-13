@@ -25,6 +25,8 @@
 @property (nonatomic, assign) RNSVGVBMOS meetOrSlice;
 @property (nonatomic, assign) BOOL responsible;
 @property (nonatomic, assign) CGRect boundingBox;
+@property (nonatomic, assign) CGAffineTransform viewBoxTransform;
+
 
 
 /**
@@ -49,5 +51,9 @@
 - (void)drawRect:(CGRect)rect;
 
 - (void)drawToContext:(CGContextRef)context withRect:(CGRect)rect;
+
+- (void)pushTransform:(CGAffineTransform)transform;
+- (CGAffineTransform)popTransform;
+- (CGAffineTransform)getReverseTransform;
 
 @end

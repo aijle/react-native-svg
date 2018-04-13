@@ -163,6 +163,7 @@
     // This needs to be painted on a layer before being composited.
     CGContextSaveGState(context);
     CGContextConcatCTM(context, self.matrix);
+    [self.svgView pushTransform:self.matrix];
     CGContextSetAlpha(context, self.opacity);
 
     [self beginTransparencyLayer:context];
@@ -170,6 +171,7 @@
     [self endTransparencyLayer:context];
 
     CGContextRestoreGState(context);
+    [self.svgView popTransform];
 }
 
 
@@ -187,6 +189,9 @@
         self.path = CGPathRetain(CFAutorelease(CGPathCreateCopy([self getPath:context])));
         [self setHitArea:self.path];
     }
+    
+    const CGRect pathBouding = CGPathGetBoundingBox(self.path);
+    self.clientRect = CGRectApplyAffineTransform(pathBouding, [self.svgView getReverseTransform]);
 
     CGPathDrawingMode mode = kCGPathStroke;
     BOOL fillColor = NO;
