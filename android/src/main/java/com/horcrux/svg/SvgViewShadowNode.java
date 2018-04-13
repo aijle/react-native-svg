@@ -28,6 +28,7 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Shadow node for RNSVG virtual tree root - RNSVGSvgView
@@ -51,6 +52,7 @@ public class SvgViewShadowNode extends LayoutShadowNode {
     private int mMeetOrSlice;
     private Matrix mInvViewBoxMatrix = new Matrix();
     private boolean mInvertible = true;
+
 
     public SvgViewShadowNode() {
         mScale = DisplayMetricsHolder.getScreenDisplayMetrics().density;
@@ -158,6 +160,7 @@ public class SvgViewShadowNode extends LayoutShadowNode {
             Matrix mViewBoxMatrix = ViewBox.getTransform(vbRect, eRect, mAlign, mMeetOrSlice);
             mInvertible = mViewBoxMatrix.invert(mInvViewBoxMatrix);
             canvas.concat(mViewBoxMatrix);
+            this.pushMatrix(mViewBoxMatrix);
         }
 
         final Paint paint = new Paint();
@@ -192,6 +195,9 @@ public class SvgViewShadowNode extends LayoutShadowNode {
                 }
             }
         });
+        if (mAlign != null) {
+            this.popMatrix();
+        }
     }
 
     private RectF getViewBox() {
@@ -271,5 +277,24 @@ public class SvgViewShadowNode extends LayoutShadowNode {
             ReactShadowNode child = getChildAt(i);
             runner.run(child);
         }
+    }
+
+
+    private Stack<Matrix> mMatrixes = new Stack<Matrix>();
+
+    public void pushMatrix(Matrix matrix) {
+        mMatrixes.push(matrix);
+    }
+
+    public Matrix popMatrix() {
+        return mMatrixes.pop();
+    }
+
+    public Matrix getReverseTransform() {
+        Matrix m = new Matrix();
+        for (Matrix item : mMatrixes) {
+            m.setConcat(m, item);
+        }
+        return m;
     }
 }
