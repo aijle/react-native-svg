@@ -25,6 +25,8 @@
 @property (nonatomic, assign) RNSVGVBMOS meetOrSlice;
 @property (nonatomic, assign) BOOL responsible;
 @property (nonatomic, assign) CGRect boundingBox;
+@property (nonatomic, assign) CGAffineTransform viewBoxTransform;
+
 
 
 /**

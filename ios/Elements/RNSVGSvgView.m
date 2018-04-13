@@ -20,6 +20,8 @@
     CGAffineTransform _invviewBoxTransform;
 }
 
+@synthesize viewBoxTransform = _viewBoxTransform;
+
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
