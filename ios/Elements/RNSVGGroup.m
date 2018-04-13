@@ -70,13 +70,14 @@
     __block CGRect groupRect = CGRectZero;
     [rects enumerateObjectsUsingBlock:^(NSValue *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         const CGRect nodeRect = obj.CGRectValue;
-        if (!CGRectIsEmpty(nodeRect)) {
-            if (CGRectIsEmpty(groupRect)) {
-                memcpy(&groupRect, &nodeRect, sizeof(CGRect));
-            } else {
-                CGRect unionRect = CGRectUnion(groupRect, nodeRect);
-                memcpy(&groupRect, &unionRect, sizeof(CGRect));
-            }
+        if (CGRectIsEmpty(nodeRect)) {
+            return ;
+        }
+        if (CGRectIsEmpty(groupRect)) {
+            memcpy(&groupRect, &nodeRect, sizeof(CGRect));
+        } else {
+            CGRect unionRect = CGRectUnion(groupRect, nodeRect);
+            memcpy(&groupRect, &unionRect, sizeof(CGRect));
         }
     }];
     self.clientRect = groupRect;
