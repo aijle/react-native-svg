@@ -30,8 +30,6 @@
 @property (nonatomic, assign) CGFloat strokeDashoffset;
 @property (nonatomic, copy) NSArray<NSString *> *propList;
 
-@property (nonatomic, copy) RCTDirectEventBlock onLayout;
-
 - (void)setHitArea:(CGPathRef)path;
 
 - (NSArray<NSString *> *)getAttributeList;

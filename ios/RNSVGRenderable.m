@@ -172,15 +172,6 @@
     CGContextRestoreGState(context);
 }
 
-- (CGAffineTransform)reduceTransform {
-    if ([self.superview isKindOfClass:[RNSVGRenderable class]]) {
-        RNSVGRenderable *const superRender = (RNSVGRenderable *)self.superview;
-        return CGAffineTransformConcat(self.matrix, [superRender reduceTransform]);
-    } else if ([self.superview isKindOfClass:[RNSVGSvgView class]]) {
-        return CGAffineTransformConcat(self.matrix, self.svgView.viewBoxTransform);
-    }
-    return CGAffineTransformIdentity;
-}
 
 - (void)renderLayerTo:(CGContextRef)context rect:(CGRect)rect
 {
@@ -198,18 +189,8 @@
     }
     
     const CGRect pathBouding = CGPathGetBoundingBox(self.path);
-    const CGRect pathLayout = CGRectApplyAffineTransform(pathBouding, [self reduceTransform]);
-    if (self.onLayout) {
-        self.onLayout(@{
-                        @"layout": @{
-                                @"x": @(pathLayout.origin.x),
-                                @"y": @(pathLayout.origin.y),
-                                @"width": @(pathLayout.size.width),
-                                @"height": @(pathLayout.size.height),
-                                }
-                        });
-    }
-    
+    self.clientRect = CGRectApplyAffineTransform(pathBouding, [self getReverseTransform]);
+
     CGPathDrawingMode mode = kCGPathStroke;
     BOOL fillColor = NO;
     [self clip:context];

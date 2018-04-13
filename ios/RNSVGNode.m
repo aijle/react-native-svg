@@ -145,6 +145,24 @@ CGFloat const RNSVG_DEFAULT_FONT_SIZE = 12;
     [container invalidate];
 }
 
+- (void)setClientRect:(CGRect)clientRect {
+    if (CGRectEqualToRect(_clientRect, clientRect)) {
+        return;
+    }
+    _clientRect = clientRect;
+    if (self.onLayout) {
+        self.onLayout(@{
+                        @"layout": @{
+                                @"x": @(_clientRect.origin.x),
+                                @"y": @(_clientRect.origin.y),
+                                @"width": @(_clientRect.size.width),
+                                @"height": @(_clientRect.size.height),
+                                }
+                        });
+
+    }
+}
+
 - (void)setClipPath:(NSString *)clipPath
 {
     if (_clipPath == clipPath) {
@@ -320,6 +338,16 @@ CGFloat const RNSVG_DEFAULT_FONT_SIZE = 12;
             break;
         }
     }
+}
+
+- (CGAffineTransform)getReverseTransform {
+    if ([self.superview isKindOfClass:[RNSVGNode class]]) {
+        RNSVGNode *const superRender = (RNSVGNode *)self.superview;
+        return CGAffineTransformConcat(self.matrix, [superRender getReverseTransform]);
+    } else if ([self.superview isKindOfClass:[RNSVGSvgView class]]) {
+        return CGAffineTransformConcat(self.matrix, self.svgView.viewBoxTransform);
+    }
+    return CGAffineTransformIdentity;
 }
 
 - (void)dealloc
