@@ -138,6 +138,14 @@
     if (clip && !CGPathContainsPoint(clip, nil, transformed, self.clipRule == kRNSVGCGFCRuleEvenodd)) {
         return nil;
     }
+    
+    if (!event) {
+        NSPredicate *const anyActive = [NSPredicate predicateWithFormat:@"active == TRUE"];
+        NSArray *const filtered = [self.subviews filteredArrayUsingPredicate:anyActive];
+        if ([filtered count] != 0) {
+            return filtered.firstObject;
+        }
+    }
 
     for (RNSVGNode *node in [self.subviews reverseObjectEnumerator]) {
         if (![node isKindOfClass:[RNSVGNode class]]) {
