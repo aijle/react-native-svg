@@ -55,8 +55,14 @@
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     const CGPoint transformed = CGPointApplyAffineTransform(point, self.invmatrix);
     RNSVGNode const* template = [self.svgView getDefinedTemplate:self.href];
-    const CGPathRef path = [template getPath:nil];
-    if (CGPathContainsPoint(path, nil, transformed, false)) {
+    if (event) {
+        self.active = NO;
+    } else if (self.active) {
+        return self;
+    }
+    UIView const* hitChild = [template hitTest:transformed withEvent:event];
+    if (hitChild) {
+        self.active = YES;
         return self;
     }
     return nil;
