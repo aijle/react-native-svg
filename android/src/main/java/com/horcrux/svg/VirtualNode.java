@@ -357,6 +357,9 @@ abstract class VirtualNode extends LayoutShadowNode {
             return;
         }
         mClientRect = rect;
+        if (mClientRect == null) {
+            return;
+        }
         EventDispatcher eventDispatcher = this.getThemedContext()
                 .getNativeModule(UIManagerModule.class)
                 .getEventDispatcher();
