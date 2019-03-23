@@ -684,8 +684,8 @@ static double RNSVGTSpan_radToDeg = 180 / M_PI;
              Determine the glyph's charwidth (i.e., the amount which the current text position
              advances horizontally when the glyph is drawn using horizontal text layout).
              */
-            double unkernedAdvance = CTFontGetAdvancesForGlyphs(fontRef, kCTFontOrientationHorizontal, &glyph, NULL, 1);
-            CGFloat charWidth = unkernedAdvance * scaleSpacingAndGlyphs;
+            // double unkernedAdvance = CTFontGetAdvancesForGlyphs(fontRef, kCTFontOrientationHorizontal, &glyph, NULL, 1);
+            // CGFloat charWidth = unkernedAdvance * scaleSpacingAndGlyphs;
 
             /*
              For each subsequent glyph, set a new startpoint-on-the-path as the previous
@@ -696,10 +696,11 @@ static double RNSVGTSpan_radToDeg = 180 / M_PI;
              adjustments are calculated as distance adjustments along the path, calculated
              using the user agent's distance along the path algorithm.
              */
-            if (autoKerning) {
-                double kerned = advances[g].width * scaleSpacingAndGlyphs;
-                kerning = kerned - charWidth;
-            }
+            // if (autoKerning) {
+            //     double kerned = advances[g].width * scaleSpacingAndGlyphs;
+            //     kerning = kerned - charWidth;
+            // }
+            CGFloat charWidth = advances[g].width * scaleSpacingAndGlyphs;
 
             CFIndex currIndex = indices[g];
             char currentChar = [str characterAtIndex:currIndex];
